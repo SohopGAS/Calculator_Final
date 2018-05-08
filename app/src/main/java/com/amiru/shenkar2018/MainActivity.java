@@ -2,187 +2,119 @@ package com.amiru.shenkar2018;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.regex.Pattern;
 
-    TextView calcScreen;
-    Button b1, b2, b3, b4, b5, b6, b7, b8, b9, b0, bplus, bminus ,bmolty , bdiv , bequal, bclear;
-    int var1, var2;
-    boolean plus,minus,mol,div;
+public class MainActivity extends AppCompatActivity {
+    private TextView calcScreen;
+    private String Display = "";
+    private String currentOperator = "";
+    private String result = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        b1 = (Button) findViewById(R.id.button1);
-        b2 = (Button) findViewById(R.id.button2);
-        b3 = (Button) findViewById(R.id.button3);
-        b4 = (Button) findViewById(R.id.button4);
-        b5 = (Button) findViewById(R.id.button5);
-        b6 = (Button) findViewById(R.id.button6);
-        b7 = (Button) findViewById(R.id.button7);
-        b8 = (Button) findViewById(R.id.button8);
-        b9 = (Button) findViewById(R.id.button9);
-        b0 = (Button) findViewById(R.id.button0);
-        bplus = (Button) findViewById(R.id.buttonPlus);
-        bminus = (Button) findViewById(R.id.buttonMinus);
-        bmolty = (Button) findViewById(R.id.buttonMultiplication);
-        bdiv = (Button) findViewById(R.id.buttonDivide);
-        bequal = (Button) findViewById(R.id.buttonEqual);
-        bclear = (Button) findViewById(R.id.buttonClear);
 
-        calcScreen = (TextView) findViewById(R.id.calcScreen);
-
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"1");
-
-            }
-        });
-        b2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"2");
-
-            }
-        });
-        b3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"3");
-
-            }
-        });
-        b4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"4");
-
-            }
-        });
-        b5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"5");
-
-            }
-        });
-        b6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"6");
-
-            }
-        });
-        b7.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"7");
-
-            }
-        });
-
-        b8.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"8");
-
-            }
-        });
-        b9.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"9");
-
-            }
-        });
-        b0.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText(calcScreen.getText()+"0");
-
-            }
-        });
-
-        bplus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                var1 = Integer.parseInt((calcScreen.getText()+""));
-                plus = true;
-                calcScreen.setText(null);
-            }
-        });
-        bminus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                var1 = Integer.parseInt((calcScreen.getText() + ""));
-                minus = true;
-                calcScreen.setText(null);
-            }
-        });
-        bdiv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                var1 = Integer.parseInt((calcScreen.getText()+""));
-                 div = true;
-                calcScreen.setText(null);
-            }
-        });
-        bmolty.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                var1 = Integer.parseInt((calcScreen.getText()+""));
-                mol = true;
-                calcScreen.setText(null);
-            }
-        });
-        bequal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                var2 = Integer.parseInt((calcScreen.getText()+""));
-                if (plus == true){
-                    calcScreen.setText(var1+var2+"");
-                    plus=false;
-                }
-                if (minus == true){
-                    calcScreen.setText(var1-var2+"");
-                    minus=false;
-                }
-                if (div == true){
-                    calcScreen.setText(var1/var2+"");
-                    div=false;
-                }
-                if (mol == true){
-                    calcScreen.setText(var1*var2+"");
-                    mol=false;
-                }
-            }
-        });
-        bclear.setOnClickListener((new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calcScreen.setText("");
-            }
-        }));
-
+        calcScreen = findViewById(R.id.calcScreen);
+        calcScreen.setText(Display);
     }
 
-    public void onDigitClicked(View view) {
+    private void updateScreen(){
+        calcScreen.setText(Display);
+    }
 
-        // "tag" is an optional string you can add to any view to use if you need
-        // here I set it in the layout file, to make sure I don't try to cast operators to Integer
-        Object tag = view.getTag();
 
-        if ("num".equals(tag)) {
-            String digitClicked = (String) ((Button) view).getText();
-            String currentText = (String) calcScreen.getText();
-            int currentValue = Integer.parseInt(currentText);
-            int newValue = 10 * currentValue + Integer.parseInt(digitClicked);
-            calcScreen.setText(String.valueOf(newValue));
+    public void onDigitClicked(View v){
+        if(result != ""){
+            clear();
+            updateScreen();
         }
+        Button b = (Button) v;
+        Display += b.getText();
+        updateScreen();
+    }
+
+    private boolean isOperator(char op){
+        switch (op){
+            case '+':
+            case '-':
+            case '*':
+            case '/':return true;
+            default: return false;
+        }
+    }
+
+
+    public void onClickOperator(View v){
+        if(Display == "") return;
+
+        Button b = (Button)v;
+
+        if(result != ""){
+            String _display = result;
+            clear();
+            Display = _display;
+        }
+
+        if(currentOperator != ""){
+            Log.d("CalcX", ""+Display.charAt(Display.length()-1));
+            if(isOperator(Display.charAt(Display.length()-1))){
+                Display = Display.replace(Display.charAt(Display.length()-1), b.getText().charAt(0));
+                updateScreen();
+                return;
+            }else{
+                getResult();
+                Display = result;
+                result = "";
+            }
+            currentOperator = b.getText().toString();
+        }
+        Display += b.getText();
+        currentOperator = b.getText().toString();
+        updateScreen();
+    }
+
+    private void clear(){
+        Display = "";
+        currentOperator = "";
+        result = "";
+    }
+
+    public void onClickClear(View v){
+        clear();
+        updateScreen();
+    }
+
+    private double operate(String a, String b, String op){
+        switch (op){
+            case "+": return Double.valueOf(a) + Double.valueOf(b);
+            case "-": return Double.valueOf(a) - Double.valueOf(b);
+            case "*": return Double.valueOf(a) * Double.valueOf(b);
+            case "/": try{
+                return Double.valueOf(a) / Double.valueOf(b);
+            }catch (Exception e){
+                Log.d("Calc", e.getMessage());
+            }
+            default: return -1;
+        }
+    }
+
+    private boolean getResult(){
+        if(currentOperator == "") return false;
+        String[] operation = Display.split(Pattern.quote(currentOperator));
+        if(operation.length < 2) return false;
+        result = String.valueOf(operate(operation[0], operation[1], currentOperator));
+        return true;
+    }
+
+    public void onClickEqual(View v){
+        if(Display == "") return;
+        if(!getResult()) return;
+        calcScreen.setText(Display + "\n" + String.valueOf(result));
     }
 }
